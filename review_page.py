@@ -105,6 +105,11 @@ class ReviewPage(QWidget):
         """
         )
 
+        self.easy_button.clicked.connect(lambda: self.ranking_buttons("2 days"))
+        self.good_button.clicked.connect(lambda: self.ranking_buttons("1 day"))
+        self.hard_button.clicked.connect(lambda: self.ranking_buttons("10 minutes"))
+        self.nothing_button.clicked.connect(lambda: self.ranking_buttons("1 minute"))
+
         self.word_container_widget = QWidget()
         self.word_container_widget.setStyleSheet(
             """
@@ -169,6 +174,9 @@ class ReviewPage(QWidget):
         self.load_card()
 
     def load_card(self):
+        self.word_reading.setVisible(False)
+        self.word_back.setVisible(False)
+        self.buttons_and_show_awnser_stacked_widget.setCurrentIndex(0)
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute(
             """
@@ -206,6 +214,25 @@ class ReviewPage(QWidget):
         self.word_back.setVisible(True)
         self.buttons_and_show_awnser_stacked_widget.setCurrentIndex(1)
 
-    def ranking_buttons(self, button):
-        if button == self.easy_button:
-            cursor.execute
+    def ranking_buttons(self, time):
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        cursor.execute(
+            f"""
+            UPDATE Cards
+            SET date_next_review = DATETIME(?, '+{time}')
+            WHERE id = (
+                SELECT id
+                FROM Cards
+                WHERE date_next_review = (
+                    SELECT MIN(date_next_review)
+                    FROM Cards
+                    WHERE date_next_review < ?
+                )
+            )
+            """,
+            (current_time,  current_time),
+        )
+        conn.commit()
+
+        self.load_card()
