@@ -8,7 +8,8 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
 )
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QPixmap
+
 import sqlite3
 from datetime import datetime
 
@@ -128,10 +129,12 @@ class ReviewPage(QWidget):
         self.word_back_widget.setStyleSheet(
             "background-color: #2b353f; border-radius: 10px;"
         )
+        self.image_label = QLabel()
         self.word_back_layout = QVBoxLayout()
         self.word_back_layout.setContentsMargins(20, 20, 20, 20)
         self.word_back_widget.setLayout(self.word_back_layout)
         self.word_back_layout.addWidget(self.word_back)
+        self.word_back_layout.addWidget(self.image_label)
         self.word_back_widget.setSizePolicy(
             QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         )
@@ -172,15 +175,15 @@ class ReviewPage(QWidget):
 
         self.setLayout(self.main_Vbox_Label)
 
-        self.load_card()
+        self.load_card(False)
 
-    def load_card(self):
+    def load_card(self, is_in_back):
         self.word_reading.setVisible(False)
         self.word_back.setVisible(False)
         self.buttons_and_show_answer_stacked_widget.setCurrentIndex(0)
         cursor.execute(
             """
-    SELECT c.front, c.reading, c.back
+    SELECT c.front, c.reading, c.back, c.image_url
     FROM Cards c
     JOIN CardReviews cr ON c.card_id = cr.card_id
     WHERE cr.next_review_date = (
@@ -194,10 +197,15 @@ class ReviewPage(QWidget):
 
         reader = cursor.fetchone()
         if reader:
-            front, reading, back = reader
+            front, reading, back, image_url = reader
             self.word_text.setText(front)
             self.word_reading.setText(reading)
             self.word_back.setText(back)
+            if is_in_back:
+                pixmap = QPixmap("data/img/" + image_url)
+                self.image_label.setPixmap(pixmap)
+            else:
+                self.image_label.setPixmap(QPixmap())
         else:
             self.no_more_cards = True
             self.word_text.setText("No more cards due!")
@@ -206,7 +214,7 @@ class ReviewPage(QWidget):
 
     def show_answer(self):
         if self.no_more_cards == False:
-            self.load_card()
+            self.load_card(True)
             self.word_reading.setVisible(True)
             self.word_back.setVisible(True)
             self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
@@ -234,4 +242,4 @@ class ReviewPage(QWidget):
         )
         conn.commit()
 
-        self.load_card()
+        self.load_card(False)
