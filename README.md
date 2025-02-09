@@ -11,24 +11,7 @@ Kotoba is a flashcard-style app designed to help you learn Japanese with a focus
 - **Customizable Decks**: Create your own decks or use pre-made ones tailored for different anime series.
 - **Progress Tracking**: Track your progress with detailed statistics and review sessions.
 - **Offline Mode**: Study anywhere, anytime—even without an internet connection.
-- **Dark Mode**: Easy on the eyes with a sleek dark mode option.
-- **Pronunciation Guide**: Listen to native pronunciation for each word to improve your speaking skills.
-
----
-
-## Installation
-
-### For Android
-
-Not yet.
-
-### For iOS
-
-Not yet.
-
-### Web Version (Coming Soon)
-
-Will be working on it soon!
+- **Pronunciation Guide**: Listen to pronunciation for each word to improve your speaking skills.
 
 ---
 
@@ -48,7 +31,8 @@ Please make sure to update tests as appropriate.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This software is licensed under the MIT License, with the following restriction:
+The software may not be used for commercial purposes without the express written permission of the original author.
 
 ---
 
@@ -57,12 +41,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you have any questions, suggestions, or feedback, feel free to reach out:
 
 - Email: your.email@example.com
-- Twitter: [@YourTwitterHandle](https://twitter.com/YourTwitterHandle)
 - Discord: YourDiscordTag#1234
-
----
-
-## Acknowledgments
-
-- Special thanks to all the contributors who helped make Kotoba better!
-- Inspired by the love for anime and the Japanese language.

@@ -38,7 +38,7 @@ class ReviewPage(QWidget):
         self.word_back.setFont(font_back)
         self.word_back.setWordWrap(True)
 
-        self.show_answer_button = QPushButton("Show awnser")
+        self.show_answer_button = QPushButton("Show answer")
         self.show_answer_button.setStyleSheet(
             """
             QPushButton{
@@ -55,7 +55,7 @@ class ReviewPage(QWidget):
         """
         )
 
-        self.show_answer_button.clicked.connect(self.show_awnser)
+        self.show_answer_button.clicked.connect(self.show_answer)
 
         self.nothing_button = QPushButton("Nothing")
         self.nothing_button.setStyleSheet(
@@ -147,7 +147,7 @@ class ReviewPage(QWidget):
         self.main_Vbox_Label = QVBoxLayout()
         self.buttons_container_widget = QWidget()
         self.buttons_container_layout = QHBoxLayout()
-        self.buttons_and_show_awnser_stacked_widget = QStackedWidget()
+        self.buttons_and_show_answer_stacked_widget = QStackedWidget()
 
         self.buttons_container_layout.addWidget(self.nothing_button)
         self.buttons_container_layout.addWidget(self.hard_button)
@@ -156,18 +156,18 @@ class ReviewPage(QWidget):
         self.buttons_container_widget.setLayout(self.buttons_container_layout)
         self.buttons_container_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.buttons_and_show_awnser_stacked_widget.addWidget(self.show_answer_button)
-        self.buttons_and_show_awnser_stacked_widget.addWidget(
+        self.buttons_and_show_answer_stacked_widget.addWidget(self.show_answer_button)
+        self.buttons_and_show_answer_stacked_widget.addWidget(
             self.buttons_container_widget
         )
-        self.buttons_and_show_awnser_stacked_widget.setSizePolicy(
+        self.buttons_and_show_answer_stacked_widget.setSizePolicy(
             QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         )
-        self.buttons_and_show_awnser_stacked_widget.setCurrentIndex(0)
+        self.buttons_and_show_answer_stacked_widget.setCurrentIndex(0)
 
         self.main_Vbox_Label.addWidget(self.word_container_widget)
         self.main_Vbox_Label.addWidget(self.word_back_widget)
-        self.main_Vbox_Label.addWidget(self.buttons_and_show_awnser_stacked_widget)
+        self.main_Vbox_Label.addWidget(self.buttons_and_show_answer_stacked_widget)
 
         self.setLayout(self.main_Vbox_Label)
 
@@ -176,19 +176,19 @@ class ReviewPage(QWidget):
     def load_card(self):
         self.word_reading.setVisible(False)
         self.word_back.setVisible(False)
-        self.buttons_and_show_awnser_stacked_widget.setCurrentIndex(0)
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.buttons_and_show_answer_stacked_widget.setCurrentIndex(0)
         cursor.execute(
             """
-            SELECT front, reading, back
-            FROM Cards
-            WHERE date_next_review = (
-                SELECT MIN(date_next_review)
-                FROM Cards
-                WHERE date_next_review < ?
-            )
-            """,
-            (current_time,),
+    SELECT c.front, c.reading, c.back
+    FROM Cards c
+    JOIN CardReviews cr ON c.card_id = cr.card_id
+    WHERE cr.next_review_date = (
+        SELECT MIN(next_review_date)
+        FROM CardReviews
+        WHERE next_review_date < ?
+    )
+    """,
+            (datetime.now().strftime("%Y-%m-%d %H:%M:%S"),),
         )
 
         reader = cursor.fetchone()
@@ -202,36 +202,38 @@ class ReviewPage(QWidget):
             self.word_reading.setText("")
             self.word_back.setText("")
 
-    def show_awnser(self):
+    def show_answer(self):
         self.load_card()
         self.word_reading.setVisible(True)
         self.word_back.setVisible(True)
-        self.buttons_and_show_awnser_stacked_widget.setCurrentIndex(1)
+        self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
 
-    def show_awnser(self):
+    def show_answer(self):
         self.load_card()
         self.word_reading.setVisible(True)
         self.word_back.setVisible(True)
-        self.buttons_and_show_awnser_stacked_widget.setCurrentIndex(1)
+        self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
 
     def ranking_buttons(self, time):
-        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         cursor.execute(
             f"""
-            UPDATE Cards
-            SET date_next_review = DATETIME(?, '+{time}')
-            WHERE id = (
-                SELECT id
-                FROM Cards
-                WHERE date_next_review = (
-                    SELECT MIN(date_next_review)
-                    FROM Cards
-                    WHERE date_next_review < ?
+            UPDATE CardReviews
+            SET next_review_date = DATETIME(?, '+{time}')
+            WHERE card_id = (
+                SELECT card_id
+                FROM CardReviews
+                WHERE next_review_date = (
+                    SELECT MIN(next_review_date)
+                    FROM CardReviews
+                    WHERE next_review_date < ?
                 )
             )
             """,
-            (current_time,  current_time),
+            (
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            ),
         )
         conn.commit()
 
