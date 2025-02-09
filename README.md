@@ -1,6 +1,6 @@
 # Kotoba - Learn Japanese with Anime Vocabulary
 
-Kotoba is a flashcard-style app designed to help you learn Japanese with a focus on anime vocabulary. Whether you're an anime enthusiast or just starting your Japanese language journey, Kotoba makes learning fun and engaging by incorporating words and phrases commonly used in anime.
+Kotoba is a flashcard-style app designed to help you learn Japanese with a focus on anime vocabulary.
 
 ---
 
@@ -25,8 +25,6 @@ We welcome contributions from the community! If you'd like to contribute to Koto
 4. Push to the branch (`git push origin feature/YourFeatureName`).
 5. Open a pull request.
 
-Please make sure to update tests as appropriate.
-
 ---
 
 ## License
@@ -40,5 +38,5 @@ The software may not be used for commercial purposes without the express written
 
 If you have any questions, suggestions, or feedback, feel free to reach out:
 
-- Email: your.email@example.com
-- Discord: YourDiscordTag#1234
+- Email: mazqyyy@gmail.com
+- Discord: mazqy
