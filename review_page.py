@@ -19,6 +19,7 @@ cursor = conn.cursor()
 class ReviewPage(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
+        self.no_more_cards = False
         font_word = QFont("Arial", 32)
         font_reading = QFont("Arial", 18)
         font_back = QFont("Arial", 24)
@@ -34,7 +35,7 @@ class ReviewPage(QWidget):
         self.word_text.setFont(font_word)
 
         self.word_back = QLabel("Back")
-        self.word_back.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        self.word_back.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.word_back.setFont(font_back)
         self.word_back.setWordWrap(True)
 
@@ -128,7 +129,7 @@ class ReviewPage(QWidget):
             "background-color: #2b353f; border-radius: 10px;"
         )
         self.word_back_layout = QVBoxLayout()
-        self.word_back_layout.setContentsMargins(0, 0, 0, 0)
+        self.word_back_layout.setContentsMargins(20, 20, 20, 20)
         self.word_back_widget.setLayout(self.word_back_layout)
         self.word_back_layout.addWidget(self.word_back)
         self.word_back_widget.setSizePolicy(
@@ -198,21 +199,17 @@ class ReviewPage(QWidget):
             self.word_reading.setText(reading)
             self.word_back.setText(back)
         else:
+            self.no_more_cards = True
             self.word_text.setText("No more cards due!")
             self.word_reading.setText("")
             self.word_back.setText("")
 
     def show_answer(self):
-        self.load_card()
-        self.word_reading.setVisible(True)
-        self.word_back.setVisible(True)
-        self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
-
-    def show_answer(self):
-        self.load_card()
-        self.word_reading.setVisible(True)
-        self.word_back.setVisible(True)
-        self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
+        if self.no_more_cards == False:
+            self.load_card()
+            self.word_reading.setVisible(True)
+            self.word_back.setVisible(True)
+            self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
 
     def ranking_buttons(self, time):
 

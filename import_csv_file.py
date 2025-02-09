@@ -28,8 +28,9 @@ cursor.execute(
         card_id INTEGER PRIMARY KEY AUTOINCREMENT,
         deck_id INTEGER NOT NULL,
         front TEXT NOT NULL,
-        reading TEXT NOT NULL,
+        reading TEXT,
         back TEXT NOT NULL,
+        image_url TEXT,
         created_at DATETIME NOT NULL,
         FOREIGN KEY (deck_id) REFERENCES Decks(deck_id) ON DELETE CASCADE
     );
@@ -58,14 +59,15 @@ deck_id = cursor.lastrowid
 
 with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
     reader = csv.reader(csvfile)
-    next(reader, None)
 
     for row in reader:
         front, reading, back = row[0], row[1], row[2]
 
+        img_url = row[3] if len(row) > 3 else ""
+
         cursor.execute(
-            "INSERT INTO Cards (deck_id, front, reading, back, created_at) VALUES (?, ?, ?, ?, ?);",
-            (deck_id, front, reading, back, date_now),
+            "INSERT INTO Cards (deck_id, front, reading, back, image_url, created_at) VALUES (?, ?, ?, ?, ?,?);",
+            (deck_id, front, reading, back, img_url, date_now),
         )
 
         card_id = cursor.lastrowid
