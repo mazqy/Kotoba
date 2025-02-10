@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
     QStackedWidget,
     QSizePolicy,
     QHBoxLayout,
+    QScrollArea,
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QPixmap
@@ -139,6 +140,57 @@ class ReviewPage(QWidget):
             QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         )
 
+        self.word_back_widget.setSizePolicy(
+    QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidget(self.word_back_widget)
+        self.scroll_area.setWidgetResizable(True)
+        
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.scroll_area.setStyleSheet("""
+    QScrollArea {
+    border: none;
+}
+
+    QScrollBar:vertical {
+    border: 2px #3a4754; 
+    background: #3a4754;
+    width: 12px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #1d232a;
+    min-height: 20px;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #555;
+}
+
+QScrollBar::sub-line, QScrollBar::add-line {
+    background: #ddd;
+    height: 10px;
+}
+
+QScrollBar::sub-line:hover, QScrollBar::add-line:hover {
+    background: #bbb;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+        background: none; /* Oculta las flechas de la barra */
+    }
+
+""")
+
+
         self.word_container_widget.setSizePolicy(
             QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         )
@@ -170,7 +222,8 @@ class ReviewPage(QWidget):
         self.buttons_and_show_answer_stacked_widget.setCurrentIndex(0)
 
         self.main_Vbox_Label.addWidget(self.word_container_widget)
-        self.main_Vbox_Label.addWidget(self.word_back_widget)
+        self.main_Vbox_Label.addWidget(self.scroll_area)
+
         self.main_Vbox_Label.addWidget(self.buttons_and_show_answer_stacked_widget)
 
         self.setLayout(self.main_Vbox_Label)
