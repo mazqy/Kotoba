@@ -4,7 +4,7 @@ from datetime import datetime
 
 date_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-conn = sqlite3.connect("cards.db")
+conn = sqlite3.connect("decks.db")
 cursor = conn.cursor()
 
 cursor.execute("DROP TABLE IF EXISTS Decks;")

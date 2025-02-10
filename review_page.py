@@ -14,7 +14,7 @@ from PyQt6.QtGui import QFont, QPixmap
 import sqlite3
 from datetime import datetime
 
-conn = sqlite3.connect("cards.db")
+conn = sqlite3.connect("decks.db")
 cursor = conn.cursor()
 
 
@@ -141,16 +141,21 @@ class ReviewPage(QWidget):
         )
 
         self.word_back_widget.setSizePolicy(
-    QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-)
+            QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        )
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidget(self.word_back_widget)
         self.scroll_area.setWidgetResizable(True)
-        
-        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.scroll_area.setStyleSheet("""
+
+        self.scroll_area.setVerticalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAsNeeded
+        )
+        self.scroll_area.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
+        self.scroll_area.setStyleSheet(
+            """
     QScrollArea {
     border: none;
 }
@@ -188,8 +193,8 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
         background: none; /* Oculta las flechas de la barra */
     }
 
-""")
-
+"""
+        )
 
         self.word_container_widget.setSizePolicy(
             QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
@@ -256,7 +261,12 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             self.word_back.setText(back)
             if is_in_back:
                 pixmap = QPixmap("data/img/" + image_url)
-                self.image_label.setPixmap(pixmap)
+                self.image_label.setPixmap(
+                    pixmap.scaledToHeight(
+                        300, Qt.TransformationMode.SmoothTransformation
+                    )
+                )
+                self.image_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
             else:
                 self.image_label.setPixmap(QPixmap())
         else:
