@@ -20,7 +20,6 @@ if __name__ == "__main__":
     stacked_widget.resize(800, 600)
 
     stacked_widget.setCurrentIndex(0)
-
     stacked_widget.show()
 
     app.exec()

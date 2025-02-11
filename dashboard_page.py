@@ -8,8 +8,15 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
 )
 from PyQt6 import QtCore, QtGui
+import sqlite3
 
-decks = ["Deck 1", "Deck 2", "Deck 3", "Deck 4", "Deck 5"]
+conn = sqlite3.connect("decks.db")
+cursor = conn.cursor()
+
+cursor.execute("SELECT name FROM Decks;")
+decks = []
+for deck in cursor.fetchall():
+    decks.append(deck[0])
 
 
 class DashboardPage(QWidget):
@@ -72,24 +79,19 @@ class DashboardPage(QWidget):
         self.top_container.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
         )
-        self.top_container.setStyleSheet("background-color: blue")
+        self.top_container.setStyleSheet(
+            "background-color: #1d232a; border-radius: 10px;"
+        )
         self.top_container_layout.addStretch(0)
         self.top_container_layout.addWidget(self.label_title)
         self.top_container_layout.addWidget(self.label_streak)
 
         for deck in decks:
-            self.deck_info_container = QWidget()
-            self.deck_info_container.setStyleSheet("background-color: green")
-            self.deck_info_container_layout = QHBoxLayout()
-            self.deck_info_container.setLayout(self.deck_info_container_layout)
-
-            self.deck_info_container.setSizePolicy(
-                QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+            self.deck_button = QPushButton(deck)
+            self.deck_button.setStyleSheet(
+                "background-color: #2b353f; border-radius: 10px; font-size: 24px;"
             )
-
-            self.deck_info_container_layout.addWidget(QLabel(deck))
-            self.deck_info_container_layout.addWidget(QLabel("70%"))
-            self.decks_Vbox_layout.addWidget(self.deck_info_container)
+            self.decks_Vbox_layout.addWidget(self.deck_button)
 
         self.main_Vbox_layout.addWidget(self.top_container)
         self.main_Vbox_layout.addLayout(self.decks_Vbox_layout)

@@ -17,6 +17,8 @@ from datetime import datetime
 conn = sqlite3.connect("decks.db")
 cursor = conn.cursor()
 
+now_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
 class ReviewPage(QWidget):
     def __init__(self, stacked_widget):
@@ -41,71 +43,45 @@ class ReviewPage(QWidget):
         self.word_back.setFont(font_back)
         self.word_back.setWordWrap(True)
 
+        def button_style(button_color, button_color_hover):
+            return f"""QPushButton {{
+                        background-color: {button_color};
+                        color: white;
+                        font-weight: bold;
+                        padding: 10px;
+                        border-radius: 10px;
+                        font-size: 16px;
+                    }}
+                    QPushButton:hover {{
+                        background-color: {button_color_hover};
+                    }}
+                """
+
         self.show_answer_button = QPushButton("Show answer")
         self.show_answer_button.setStyleSheet(
-            """
-            QPushButton{
-            background-color: rgb(0, 150, 214);
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 16px;
-            }
-            QPushButton:hover {
-                background-color: rgba(0, 150, 214, 75%);
-            }
-        """
+            button_style("#0096d6", "rgba(0, 150, 214, 75%)")
         )
 
         self.show_answer_button.clicked.connect(self.show_answer)
 
         self.nothing_button = QPushButton("Nothing")
         self.nothing_button.setStyleSheet(
-            """
-            background-color: #f23030;
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 16px;
-        """
+            button_style("#f23030", "rgba(242, 48, 48, 75%)")
         )
 
         self.hard_button = QPushButton("Hard")
         self.hard_button.setStyleSheet(
-            """
-            background-color: #f28e30;
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 16px;
-        """
+            button_style("#f28e30", "rgba(242, 142, 48, 75%)")
         )
 
         self.good_button = QPushButton("Good")
         self.good_button.setStyleSheet(
-            """
-            background-color: #6fd62a;
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 16px;
-        """
+            button_style("#6fd62a", "rgba(111, 214, 42, 75%)")
         )
 
         self.easy_button = QPushButton("Easy")
         self.easy_button.setStyleSheet(
-            """
-            background-color: #30bef2;
-            color: white;
-            font-weight: bold;
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 16px;
-        """
+            button_style("#30bef2", "rgba(48, 190, 242, 75%)")
         )
 
         self.easy_button.clicked.connect(lambda: self.ranking_buttons("2 days"))
@@ -190,7 +166,7 @@ QScrollBar::add-page, QScrollBar::sub-page {
     background: none;
 }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-        background: none; /* Oculta las flechas de la barra */
+        background: none;
     }
 
 """
@@ -250,7 +226,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
         WHERE next_review_date < ?
     )
     """,
-            (datetime.now().strftime("%Y-%m-%d %H:%M:%S"),),
+            (now_date_time,),
         )
 
         reader = cursor.fetchone()
@@ -299,8 +275,8 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             )
             """,
             (
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                now_date_time,
+                now_date_time,
             ),
         )
         conn.commit()
