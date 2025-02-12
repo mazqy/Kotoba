@@ -4,17 +4,6 @@ Kotoba is a flashcard-style app designed to help you learn Japanese with a focus
 
 ---
 
-## Features
-
-- **Anime-Themed Vocabulary**: Learn Japanese through words and phrases frequently used in popular anime.
-- **Flashcard System**: A simple and effective flashcard system to help you memorize vocabulary efficiently.
-- **Customizable Decks**: Create your own decks or use pre-made ones tailored for different anime series.
-- **Progress Tracking**: Track your progress with detailed statistics and review sessions.
-- **Offline Mode**: Study anywhere, anytime—even without an internet connection.
-- **Pronunciation Guide**: Listen to pronunciation for each word to improve your speaking skills.
-
----
-
 ## Contributing
 
 We welcome contributions from the community! If you'd like to contribute to Kotoba, please follow these steps:

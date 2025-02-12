@@ -9,19 +9,24 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6 import QtCore, QtGui
 import sqlite3
+import json
 
-conn = sqlite3.connect("decks.db")
+ruta_archivo = "data/config.json"
+
+
+conn = sqlite3.connect("Kotoba.db")
 cursor = conn.cursor()
 
-cursor.execute("SELECT name FROM Decks;")
+cursor.execute("SELECT deck_id, name FROM Decks;")
 decks = []
 for deck in cursor.fetchall():
-    decks.append(deck[0])
+    decks.append((deck[0], deck[1]))
 
 
 class DashboardPage(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
+
         self.stacked_widget = stacked_widget
 
         self.main_Vbox_layout = QVBoxLayout()
@@ -65,11 +70,18 @@ class DashboardPage(QWidget):
         self.button_start_review = QPushButton("Start review")
         self.button_start_review.setStyleSheet(
             """
+    QPushButton {
     background-color: green;
     color: white;
     border-radius: 10px;
     padding: 10px;
     font-size: 16px;
+    font-weight: bold;
+    }
+    QPushButton:hover {
+    background-color: white;
+    color: green;
+    }
                                                
 """
         )
@@ -87,7 +99,10 @@ class DashboardPage(QWidget):
         self.top_container_layout.addWidget(self.label_streak)
 
         for deck in decks:
-            self.deck_button = QPushButton(deck)
+            self.deck_button = QPushButton(deck[1])
+            self.deck_button.clicked.connect(
+                lambda _, deck_id=deck[0]: self.select_deck(deck_id)
+            )
             self.deck_button.setStyleSheet(
                 "background-color: #2b353f; border-radius: 10px; font-size: 24px;"
             )
@@ -102,3 +117,14 @@ class DashboardPage(QWidget):
 
     def go_to_review_page(self):
         self.stacked_widget.setCurrentIndex(1)
+
+    def select_deck(self, deck_id):
+        print(deck_id)
+        with open(ruta_archivo, "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)  # Cargar los datos como un diccionario de Python
+
+            datos["curr_deck"] = deck_id
+
+            # Guardar los cambios de vuelta al archivo JSON
+            with open(ruta_archivo, "w", encoding="utf-8") as archivo:
+                json.dump(datos, archivo, indent=4, ensure_ascii=False)

@@ -1,4 +1,5 @@
 {
+    "curr_deck": 1,
     "ui_theme": "dark",
     "cards_per_day": 20
 }

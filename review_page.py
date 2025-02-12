@@ -10,19 +10,33 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QPixmap
+import json
 
 import sqlite3
 from datetime import datetime
 
-conn = sqlite3.connect("decks.db")
+
+conn = sqlite3.connect("Kotoba.db")
 cursor = conn.cursor()
 
-now_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+# Ruta al archivo JSON
+file_path = "data/config.json"
+
+# Leer el archivo JSON y cargar los datos
+with open(file_path, "r", encoding="utf-8") as file:
+    data = json.load(file)
+
+# Acceder al valor de 'curr_deck'
+curr_deck_value = data.get("curr_deck")
+
+# Imprimir el valor
 
 
 class ReviewPage(QWidget):
     def __init__(self, stacked_widget):
         super().__init__()
+
         self.no_more_cards = False
         font_word = QFont("Arial", 32)
         font_reading = QFont("Arial", 18)
@@ -43,45 +57,47 @@ class ReviewPage(QWidget):
         self.word_back.setFont(font_back)
         self.word_back.setWordWrap(True)
 
-        def button_style(button_color, button_color_hover):
+        def button_style(color1, color2):
             return f"""QPushButton {{
-                        background-color: {button_color};
-                        color: white;
+                        background-color: {color1};
+                        color: {color2};
                         font-weight: bold;
                         padding: 10px;
                         border-radius: 10px;
                         font-size: 16px;
+                        
                     }}
                     QPushButton:hover {{
-                        background-color: {button_color_hover};
+                        background-color: {color2};
+                        color: {color1};
                     }}
                 """
 
         self.show_answer_button = QPushButton("Show answer")
         self.show_answer_button.setStyleSheet(
-            button_style("#0096d6", "rgba(0, 150, 214, 75%)")
+            button_style("#0096d6", "rgba(255, 255, 255, 100%)")
         )
 
         self.show_answer_button.clicked.connect(self.show_answer)
 
         self.nothing_button = QPushButton("Nothing")
         self.nothing_button.setStyleSheet(
-            button_style("#f23030", "rgba(242, 48, 48, 75%)")
+            button_style("#f23030", "rgba(255, 255, 255, 100%)")
         )
 
         self.hard_button = QPushButton("Hard")
         self.hard_button.setStyleSheet(
-            button_style("#f28e30", "rgba(242, 142, 48, 75%)")
+            button_style("#f28e30", "rgba(255, 255, 255, 100%)")
         )
 
         self.good_button = QPushButton("Good")
         self.good_button.setStyleSheet(
-            button_style("#6fd62a", "rgba(111, 214, 42, 75%)")
+            button_style("#6fd62a", "rgba(255, 255, 255, 100%)")
         )
 
         self.easy_button = QPushButton("Easy")
         self.easy_button.setStyleSheet(
-            button_style("#30bef2", "rgba(48, 190, 242, 75%)")
+            button_style("#30bef2", "rgba(255, 255, 255, 100%)")
         )
 
         self.easy_button.clicked.connect(lambda: self.ranking_buttons("2 days"))
@@ -217,21 +233,18 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
         self.buttons_and_show_answer_stacked_widget.setCurrentIndex(0)
         cursor.execute(
             """
-    SELECT c.front, c.reading, c.back, c.image_url
-    FROM Cards c
-    JOIN CardReviews cr ON c.card_id = cr.card_id
-    WHERE cr.next_review_date = (
-        SELECT MIN(next_review_date)
-        FROM CardReviews
-        WHERE next_review_date < ?
-    )
-    """,
-            (now_date_time,),
+            SELECT c.card_id, c.front, c.reading, c.back, c.image_url
+            FROM Cards AS c
+            JOIN Decks AS d ON c.deck_id = d.deck_id
+            WHERE d.deck_id = ?
+            AND c.next_review_date < ?
+            LIMIT 1;
+            """,
+            (curr_deck_value, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
         )
-
         reader = cursor.fetchone()
         if reader:
-            front, reading, back, image_url = reader
+            self.current_card_id, front, reading, back, image_url = reader
             self.word_text.setText(front)
             self.word_reading.setText(reading)
             self.word_back.setText(back)
@@ -259,26 +272,17 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
 
     def ranking_buttons(self, time):
-
         cursor.execute(
-            f"""
-            UPDATE CardReviews
-            SET next_review_date = DATETIME(?, '+{time}')
-            WHERE card_id = (
-                SELECT card_id
-                FROM CardReviews
-                WHERE next_review_date = (
-                    SELECT MIN(next_review_date)
-                    FROM CardReviews
-                    WHERE next_review_date < ?
-                )
-            )
+            """
+            UPDATE Cards
+            SET next_review_date = DATETIME(?, ?)
+            WHERE card_id = ?;
             """,
             (
-                now_date_time,
-                now_date_time,
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                f"+{time}",
+                self.current_card_id,
             ),
         )
         conn.commit()
-
         self.load_card(False)
