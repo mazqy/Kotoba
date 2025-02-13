@@ -166,7 +166,7 @@ QScrollBar::handle:vertical {
 }
 
 QScrollBar::handle:vertical:hover {
-    background: #555;
+    background: white;
 }
 
 QScrollBar::sub-line, QScrollBar::add-line {

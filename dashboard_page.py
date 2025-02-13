@@ -104,7 +104,18 @@ class DashboardPage(QWidget):
                 lambda _, deck_id=deck[0]: self.select_deck(deck_id)
             )
             self.deck_button.setStyleSheet(
-                "background-color: #2b353f; border-radius: 10px; font-size: 24px;"
+                """
+    QPushButton {
+        background-color: #2b353f;
+        border-radius: 10px;
+        font-size: 24px;
+        color: white;
+    }
+    QPushButton:hover {
+        color: #2b353f;
+        background-color: white;
+    }
+    """
             )
             self.decks_Vbox_layout.addWidget(self.deck_button)
 

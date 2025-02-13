@@ -10,7 +10,7 @@ if __name__ == "__main__":
     stacked_widget = QStackedWidget()
     stacked_widget.setWindowTitle("Kotoba")
     stacked_widget.setWindowIcon(QIcon("data/icon2.png"))
-    stacked_widget.setStyleSheet("background-color: #3a4754; color: white;")
+    stacked_widget.setStyleSheet("background-color: #171a1c; color: white;")
     dashboard_page = DashboardPage(stacked_widget)
     review_page = ReviewPage(stacked_widget)
 
