@@ -23,22 +23,24 @@ if input() == "y":
     )
 
     cursor.execute(
-        """
-        CREATE TABLE Cards (
-            card_id INTEGER PRIMARY KEY AUTOINCREMENT,
-            deck_id INTEGER NOT NULL,
-            front TEXT NOT NULL,
-            reading TEXT,
-            back TEXT NOT NULL,
-            image_url TEXT,
-            next_review_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-            created_at DATETIME NOT NULL,
-            FOREIGN KEY (deck_id) REFERENCES Decks(deck_id) ON DELETE CASCADE
-        );
-        """
+        f"""
+    CREATE TABLE Cards (
+        card_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        deck_id INTEGER NOT NULL,
+        front TEXT NOT NULL,
+        reading TEXT,
+        back TEXT NOT NULL,
+        image_url TEXT,
+        next_review_date DATETIME DEFAULT '{date_now}',
+        current_interval INTEGER DEFAULT 1440,
+        level INTEGER DEFAULT 0,
+        created_at DATETIME NOT NULL,
+        FOREIGN KEY (deck_id) REFERENCES Decks(deck_id) ON DELETE CASCADE
+    );
+    """
     )
 
-csv_file_path = "Dareka no Manazashi.csv"
+csv_file_path = "data/csv/Dareka no Manazashi.csv"
 
 cursor.execute(
     "INSERT INTO Decks (name, description, created_at) VALUES (?, ?, ?)",

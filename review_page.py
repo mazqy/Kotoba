@@ -13,24 +13,19 @@ from PyQt6.QtGui import QFont, QPixmap
 import json
 
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 conn = sqlite3.connect("Kotoba.db")
 cursor = conn.cursor()
 
 
-# Ruta al archivo JSON
 file_path = "data/config.json"
 
-# Leer el archivo JSON y cargar los datos
 with open(file_path, "r", encoding="utf-8") as file:
     data = json.load(file)
 
-# Acceder al valor de 'curr_deck'
 curr_deck_value = data.get("curr_deck")
-
-# Imprimir el valor
 
 
 class ReviewPage(QWidget):
@@ -100,10 +95,10 @@ class ReviewPage(QWidget):
             button_style("#30bef2", "rgba(255, 255, 255, 100%)")
         )
 
-        self.easy_button.clicked.connect(lambda: self.ranking_buttons("2 days"))
-        self.good_button.clicked.connect(lambda: self.ranking_buttons("1 day"))
-        self.hard_button.clicked.connect(lambda: self.ranking_buttons("10 minutes"))
-        self.nothing_button.clicked.connect(lambda: self.ranking_buttons("1 minute"))
+        self.easy_button.clicked.connect(lambda: self.ranking_buttons("Easy"))
+        self.good_button.clicked.connect(lambda: self.ranking_buttons("Good"))
+        self.hard_button.clicked.connect(lambda: self.ranking_buttons("Hard"))
+        self.nothing_button.clicked.connect(lambda: self.ranking_buttons("Nothing"))
 
         self.word_container_widget = QWidget()
         self.word_container_widget.setStyleSheet(
@@ -271,18 +266,44 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             self.word_back.setVisible(True)
             self.buttons_and_show_answer_stacked_widget.setCurrentIndex(1)
 
-    def ranking_buttons(self, time):
+    def ranking_buttons(self, button):
+        global curr_deck_value
+        if button == "Easy":
+            ease = 2.5 * 1.5
+        elif button == "Good":
+            ease = 2.5
+        elif button == "Hard":
+            ease = 2.5 * 0.85
+
+        cursor.execute(
+            """
+            SELECT current_interval FROM Cards WHERE card_id = ?;
+            """,
+            (self.current_card_id,),
+        )
+        result = cursor.fetchone()
+
+        current_interval = result[0]
+
+        if button == "Nothing":
+            next_interval_minutes = 1
+        else:
+            next_interval_minutes = current_interval * ease
+
+        next_review_date = datetime.now() + timedelta(minutes=next_interval_minutes)
+        print(next_review_date)
+
         cursor.execute(
             """
             UPDATE Cards
-            SET next_review_date = DATETIME(?, ?)
+            SET next_review_date = ?
             WHERE card_id = ?;
             """,
             (
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                f"+{time}",
+                next_review_date.strftime("%Y-%m-%d %H:%M:%S"),
                 self.current_card_id,
             ),
         )
         conn.commit()
+
         self.load_card(False)
